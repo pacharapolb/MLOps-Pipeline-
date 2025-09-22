@@ -1,0 +1,7 @@
+mlruns/
+mlops_pipeline/artifacts/
+__pycache__/
+*.pyc
+*.pkl
+*.joblib
+.env
