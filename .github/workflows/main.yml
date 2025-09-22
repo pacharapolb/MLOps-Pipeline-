@@ -68,8 +68,8 @@ jobs:
           python mlops_pipeline/scripts/03_train_evaluate_register.py "${{ steps.preprocessing.outputs.run_id }}" 10.0
 
       - name: Transition Model to Staging
-          if: success()
-          run: python mlops_pipeline/scripts/04_transition_model.py "bc-classifier-prod" "staging"    
+        if: success()
+        run: python mlops_pipeline/scripts/04_transition_model.py "bc-classifier-prod" "staging"    
 
       - name: Upload MLflow artifacts for inspection
         if: success()
