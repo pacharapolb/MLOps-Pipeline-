@@ -43,6 +43,9 @@ def main():
     mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "file:./mlruns"))
     mlflow.set_experiment(EXPERIMENT)
     with mlflow.start_run(run_name="02_data_preprocessing") as run:
+        run_id = run.info.run_id
+
+        # log parameters & metrics
         mlflow.log_param("test_size", 0.2)
         mlflow.log_param("scaler", "StandardScaler")
         mlflow.log_metric("train_rows", train_df.shape[0])
@@ -51,7 +54,13 @@ def main():
         mlflow.log_artifact(str(test_path))
         mlflow.log_artifact(str(scaler_path))
 
-        print(f"[OK] Run ID: {run.info.run_id}")  # ใช้ต่อในขั้นถัดไป
+        print(f"[OK] Run ID: {run_id}")  # ใช้ต่อในขั้นถัดไป
+
+        # ✅ ส่ง run_id ออกไปให้ GitHub Actions ใช้ใน step ถัดไป
+        github_output = os.environ.get("GITHUB_OUTPUT")
+        if github_output:
+            with open(github_output, "a", encoding="utf-8") as f:
+                f.write(f"run_id={run_id}\n")
 
 if __name__ == "__main__":
     main()
