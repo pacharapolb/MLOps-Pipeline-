@@ -3,10 +3,9 @@ import sys, os
 import mlflow
 from mlflow.tracking import MlflowClient
 
-def transition_model_alias(model_name: str, target_stage: str):
+def transition_model_alias(model_name: str, target_alias: str):
     """
-    เปลี่ยน Stage ของ model version ล่าสุดใน Model Registry
-    เช่น Staging / Production / Archived
+    กำหนด alias ให้ model version ล่าสุด เช่น "staging" หรือ "prod"
     """
     mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "file:./mlruns"))
     client = MlflowClient()
@@ -17,16 +16,15 @@ def transition_model_alias(model_name: str, target_stage: str):
         return
 
     latest = sorted(versions, key=lambda v: int(v.version))[-1]
-    client.transition_model_version_stage(
+    client.set_registered_model_alias(
         name=model_name,
+        alias=target_alias,
         version=latest.version,
-        stage=target_stage,
-        archive_existing_versions=False
     )
-    print(f"[OK] Transitioned {model_name} v{latest.version} -> {target_stage}")
+    print(f"[OK] Set alias '{target_alias}' for {model_name} v{latest.version}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python scripts/04_transition_model.py <model_name> <target_stage>")
+        print("Usage: python scripts/04_transition_model.py <model_name> <target_alias>")
         sys.exit(1)
     transition_model_alias(sys.argv[1], sys.argv[2])
